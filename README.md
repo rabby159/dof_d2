@@ -3,7 +3,7 @@
 Capstone thesis, Dept. of CSE, Green University of Bangladesh.
 Supervisor: Babe Sultana. Authors: Md Rabby, Gazi Faria Akter, Md Julfikar Alam.
 
-Live app: https://dengue26.streamlit.app/
+Live app: [https://dengue26.streamlit.app/](https://dofbd26.streamlit.app/)
 
 ## What it does
 Forecasts national weekly dengue cases in Bangladesh **one week ahead** and maps the forecast to an early-warning level
