@@ -1,0 +1,22 @@
+,0
+LSTM sequence embedding,0.14408673
+Case growth (last wk),0.047081266
+Season (week of year),0.040610448
+Recent case levels,0.034506846
+Temperature (4-wk avg),0.015818179
+Case growth (4-wk trend),0.011341856
+Case growth (2 wk ago),0.01022269
+"Temperature, 2 wk ago",0.009091753
+"Temperature, 3 wk ago",0.008555234
+"Temperature, 1 wk ago",0.008054208
+"Temperature, 4 wk ago",0.007834045
+"Humidity, 4 wk ago",0.00394825
+"Humidity, 1 wk ago",0.003890817
+"Rainfall, 2 wk ago",0.0030808377
+"Rainfall, 4 wk ago",0.0027474721
+"Rainfall, 1 wk ago",0.0027417382
+"Humidity, 2 wk ago",0.0021903296
+"Humidity, 3 wk ago",0.0019569106
+Humidity (4-wk avg),0.0013626171
+"Rainfall, 3 wk ago",0.000884128
+Rainfall (4-wk avg),0.00066618295
