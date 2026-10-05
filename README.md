@@ -31,11 +31,15 @@ XGBoost-only, which fails on the unprecedented 2023 outbreak. Weather contribute
 
 ## Run
 ```bash
-pip install -r requirements-dev.txt
+pip install -r requirements.txt          # app only (no TensorFlow needed)
+streamlit run app.py
+
+pip install -r requirements-train.txt    # only to retrain / re-evaluate (TensorFlow)
 python evaluate.py          # walk-forward evaluation -> outputs/
 python train_pipeline.py    # final model -> models/, outputs/shap_global.png
+
+pip install -r requirements-dev.txt
 python -m pytest -q
-streamlit run app.py
 ```
 
 ## Data
@@ -43,7 +47,7 @@ Weekly national dengue cases and weather, 2019-08-21 to 2026-09-27 (372 weeks), 
 Each row is one Mon-Sun week, **labelled by its last day (Sunday)**; the column is named `start_date` for historical reasons.
 Cases: DGHS dengue dashboard, "Dengue affected (Admitted) by date", summed over the 7 days of each week
 (spot-check: 21-27 Sep 2026 = 11,722, matching the dataset). Hospital admissions, not all infections.
-**https://dashboard.dghs.gov.bd/pages/heoc_dengue_v1.php, https://server6.bmd.gov.bd/**
+**TODO (authors): add the dashboard URL, access date and the weather data source.**
 2020-2021 contain near-zero reported cases and are kept as a documented limitation.
 
 ## Prospective check (logged before the data were available)

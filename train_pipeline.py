@@ -54,6 +54,8 @@ for s in SEEDS:
     Z = np.hstack([Xs, emb])
     reg = make_xgb(s).fit(Z, yt)
     lstm.save(f"models/lstm_s{s}.keras")
+    k, r_, b_ = lstm.get_layer("emb").get_weights()          # NumPy weights -> app runs without TensorFlow
+    np.savez(f"models/lstm_s{s}.npz", kernel=k, recurrent=r_, bias=b_)
     reg.save_model(f"models/xgb_s{s}.json")
     import xgboost as xgb
     c = reg.get_booster().predict(xgb.DMatrix(Z), pred_contribs=True)
@@ -103,5 +105,5 @@ meta = {
 }
 with open("models/meta.json", "w") as f:
     json.dump(meta, f, indent=2)
-print("Saved models/, outputs/shap_global.png, models/meta.json")
+print("Saved models/ (.keras + .npz + .json), outputs/shap_global.png, models/meta.json")
 print("Risk thresholds:", {k: round(v) for k, v in risk.items()}, "| interval (log):", round(q10, 3), round(q90, 3))

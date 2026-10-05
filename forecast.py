@@ -1,41 +1,62 @@
-"""Inference: loads the saved hybrid LSTM-XGBoost ensemble and produces a forecast + explanation."""
+"""Inference only: NumPy LSTM + XGBoost Booster. No TensorFlow needed to run the app.
+
+The LSTM weights are exported to models/lstm_s{seed}.npz by train_pipeline.py
+(Keras gate order: input, forget, cell, output).
+"""
 import json
 import os
 import numpy as np
 import pandas as pd
+import xgboost as xgb
 from features import TAB_COLS, forecast_inputs, friendly
 
-os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "3")
+
+def _sigmoid(x):
+    return 1.0 / (1.0 + np.exp(-x))
+
+
+class NumpyLSTM:
+    def __init__(self, path):
+        z = np.load(path)
+        self.W, self.U, self.b = z["kernel"], z["recurrent"], z["bias"]
+        self.units = self.U.shape[0]
+
+    def embed(self, seq):
+        """seq: (T, n_features) -> last hidden state (units,)"""
+        h = np.zeros(self.units)
+        c = np.zeros(self.units)
+        for x in seq:
+            z = x @ self.W + h @ self.U + self.b
+            i, f, g, o = np.split(z, 4)
+            c = _sigmoid(f) * c + _sigmoid(i) * np.tanh(g)
+            h = _sigmoid(o) * np.tanh(c)
+        return h
 
 
 class Forecaster:
     def __init__(self, model_dir="models"):
-        import tensorflow as tf
-        import xgboost as xgb
         with open(os.path.join(model_dir, "meta.json")) as f:
             self.meta = json.load(f)
         m = self.meta
         self.tab_mean, self.tab_scale = np.array(m["tab_mean"]), np.array(m["tab_scale"])
         self.seq_mean, self.seq_scale = np.array(m["seq_mean"]), np.array(m["seq_scale"])
-        self.embedders, self.xgbs = [], []
+        self.lstms, self.boosters = [], []
         for s in m["seeds"]:
-            lstm = tf.keras.models.load_model(os.path.join(model_dir, f"lstm_s{s}.keras"))
-            self.embedders.append(tf.keras.models.Model(lstm.input, lstm.get_layer("emb").output))
-            reg = xgb.XGBRegressor()
-            reg.load_model(os.path.join(model_dir, f"xgb_s{s}.json"))
-            self.xgbs.append(reg)
+            self.lstms.append(NumpyLSTM(os.path.join(model_dir, f"lstm_s{s}.npz")))
+            b = xgb.Booster()
+            b.load_model(os.path.join(model_dir, f"xgb_s{s}.json"))
+            self.boosters.append(b)
 
     def predict(self, history, next_date=None):
-        import xgboost as xgb
         X, S, nd, last = forecast_inputs(history, next_date)
-        Xs = (X.values - self.tab_mean) / self.tab_scale
-        Ss = ((S - self.seq_mean) / self.seq_scale)[None, :, :].astype("float32")
+        Xs = ((X.values - self.tab_mean) / self.tab_scale)[0]
+        Ss = (S - self.seq_mean) / self.seq_scale
         growths, tab_contrib, emb_contrib, bias = [], [], [], []
-        for emb_model, reg in zip(self.embedders, self.xgbs):
-            e = emb_model(Ss, training=False).numpy()
-            Z = np.hstack([Xs, e])
-            growths.append(float(reg.predict(Z)[0]))
-            c = reg.get_booster().predict(xgb.DMatrix(Z), pred_contribs=True)[0]
+        for lstm, booster in zip(self.lstms, self.boosters):
+            Z = np.hstack([Xs, lstm.embed(Ss)])[None, :]
+            dm = xgb.DMatrix(Z)
+            growths.append(float(booster.predict(dm)[0]))
+            c = booster.predict(dm, pred_contribs=True)[0]
             tab_contrib.append(c[: len(TAB_COLS)])
             emb_contrib.append(c[len(TAB_COLS):-1].sum())
             bias.append(c[-1])
