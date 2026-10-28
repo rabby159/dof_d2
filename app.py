@@ -234,8 +234,7 @@ st.subheader("Limitations")
 * Short history (7 seasons) and COVID-era reporting gaps.
 * Prediction intervals are empirical and wide (roughly −34% to +43% around the point forecast).
 * Weather adds little predictive information beyond past cases and seasonality in this dataset.
-* Research prototype, not an operational public-health tool.
-""")
+* Research prototype, not an operational public-health tool. """)
 
 # ---------------------------------------------------------
 # Empirical Risk Tier Validation (Cohen's Kappa)
