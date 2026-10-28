@@ -234,8 +234,9 @@ st.subheader("Limitations")
 * Short history (7 seasons) and COVID-era reporting gaps.
 * Prediction intervals are empirical and wide (roughly −34% to +43% around the point forecast).
 * Weather adds little predictive information beyond past cases and seasonality in this dataset.
-* Research prototype, not an operational public-health tool. """)
-
+* Research prototype, not an operational public-health tool.
+  """)
+st.markdown("---")
 # ---------------------------------------------------------
 # Empirical Risk Tier Validation (Cohen's Kappa)
 # ---------------------------------------------------------
@@ -251,4 +252,3 @@ val_col4.metric("Severe Risk Precision", "83.78%", help="Low false-alarm rate un
 st.markdown("""
 * **Clinical Implication:** A Quadratic Weighted Kappa of **0.9543** confirms that the early warning engine avoids catastrophic misclassifications (e.g., mislabeling an active epidemic as low risk).
 """)
-st.markdown("---")
