@@ -213,7 +213,7 @@ with tab3:
             "comparatively little. This is reported as a finding, not hidden.")
 
 # ------------------------------------------------------------------ Tab 4
-# with tab4:
+with tab4:
 #     st.subheader("Evaluation protocol")
 #     st.markdown(f"""
 # * **Task:** true 1-week-ahead forecast. Inputs use only information up to the previous week (past cases, past weather) and the
