@@ -212,7 +212,7 @@ with tab3:
         st.image("outputs/shap_global.png")
     st.info("In this dataset, recent case dynamics and seasonality dominate the forecast; weather variables contribute "
             "comparatively little. This is reported as a finding, not hidden.")
-  # ---------------------------------------------------------
+    # ---------------------------------------------------------
     # Dual-Stage XAI: Deep Sequence Attribution (Integrated Gradients)
     # ---------------------------------------------------------
     st.markdown("---")
@@ -241,18 +241,17 @@ with tab3:
             0.0218, 0.0216
         ]
     }
-    df_ig = pd.DataFrame(ig_data).sort_values(by="Attribution Score", ascending=True)
+    df_ig = pd.DataFrame(ig_data)
 
-    fig_ig, ax_ig = plt.subplots(figsize=(8, 5))
-    ax_ig.barh(df_ig["Feature"], df_ig["Attribution Score"], color="#2b5c8f", edgecolor="black", alpha=0.85)
-    ax_ig.set_xlabel("Mean |Integrated Gradients Score|", fontsize=10)
-    ax_ig.set_title("LSTM Sequence Attribution (Multi-Week Bioclimatic Drivers)", fontsize=11, pad=10)
-    ax_ig.grid(axis="x", linestyle="--", alpha=0.5)
-    plt.tight_layout()
+    chart_ig = alt.Chart(df_ig).mark_bar(color="#2b5c8f").encode(
+        x=alt.X("Attribution Score:Q", title="Mean |Integrated Gradients Score|"),
+        y=alt.Y("Feature:N", sort="-x", title="Feature"),
+        tooltip=["Feature", "Attribution Score"]
+    ).properties(height=380)
 
     col_chart, col_desc = st.columns([1.3, 1])
     with col_chart:
-        st.pyplot(fig_ig)
+        st.altair_chart(chart_ig, use_container_width=True)
     with col_desc:
         st.markdown("""
         **Key Epidemiological Insights:**
